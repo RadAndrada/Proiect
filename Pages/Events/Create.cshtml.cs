@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,7 +10,7 @@ using Proiect.Models;
 
 namespace Proiect.Pages.Events
 {
-    public class CreateModel : PageModel
+    public class CreateModel : EventCategoriesPageModel
     {
         private readonly Proiect.Data.ProiectContext _context;
 
@@ -22,26 +21,36 @@ namespace Proiect.Pages.Events
 
         public IActionResult OnGet()
         {
-            ViewData["ContactID"] = new SelectList(_context.Set<Contact>(), "ID",
-"ContactEmail,ContactPhone");
+        ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
+            var newEvent = new Event();
+            Event.EventCategories = new List<EventCategory>();
+            PopulateAssignedCategoryData(_context, newEvent);
 
             return Page();
         }
 
         [BindProperty]
-        public Event Event { get; set; } = default!;
+        public Event Event { get; set; } 
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string[] selectedCategories)
         {
-            if (!ModelState.IsValid)
+            var newEvent = new Event();
+            if (selectedCategories != null)
             {
-                return Page();
+                newEvent.EventCategories = new List<EventCategory>();
+                foreach (var cat in selectedCategories)
+                {
+                    var catToAdd = new EventCategory
+                    {
+                        CategoryID = int.Parse(cat)
+                    };
+                    newEvent.EventCategories.Add(catToAdd);
+                }
             }
-
+            Event.EventCategories = newEvent.EventCategories;
             _context.Event.Add(Event);
             await _context.SaveChangesAsync();
-
             return RedirectToPage("./Index");
         }
     }

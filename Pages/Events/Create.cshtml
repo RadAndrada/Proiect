@@ -19,9 +19,9 @@
                 <span asp-validation-for="Event.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                    <label asp-for="Event.Description" class="control-label"></label>
-                    <input asp-for="Event.Description" class="form-control" />
-                    <span asp-validation-for="Event.Description" class="text-danger"></span>
+                <label asp-for="Event.Description" class="control-label"></label>
+                <input asp-for="Event.Description" class="form-control" />
+                <span asp-validation-for="Event.Description" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Event.Location" class="control-label"></label>
@@ -31,7 +31,7 @@
             <div class="form-group">
                 <label asp-for="Event.Date" class="control-label"></label>
                 <input asp-for="Event.Date" class="form-control" />
-                <span asp-validation-for="Event.Date" class="textdanger"></span>
+                <span asp-validation-for="Event.Date" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Event.Price" class="control-label"></label>
@@ -39,10 +39,34 @@
                 <span asp-validation-for="Event.Price" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Event.ContactID" class="control-label">ContactEmail</label>
-                <select asp-for="Event.ContactID" class="form-control" asp-items="ViewBag.ContactID">
-                </select>
-                <span asp-validation-for="Event.ContactID" class="text-danger"></span>
+                <label asp-for="Event.ContactID" class="control-label"></label>
+                <select asp-for="Event.ContactID" class ="form-control" asp-items="ViewBag.ContactID"></select>
+            </div>
+             <div class="form-group">
+                <div class="table">
+                    <table>
+                        <tr>
+                            @{
+                                int cnt = 0;
+
+                                foreach (var cat in Model.AssignedCategoryDataList)
+                                {
+                                    if (cnt++%3==0)
+                                    {
+                                        @:<tr></tr>
+                                    }
+                                    @:<td>
+                                    <input type="checkbox"
+                                    name="selectedCategories"
+                                    value="@cat.CategoryID"
+                                    @(Html.Raw(cat.Assigned ? "checked=\"checked\"":""))/>
+                                    @cat.CategoryID @:  @cat.Name
+                                    @:</td>
+                                }
+                            @:</tr>
+                          }
+                    </table>
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

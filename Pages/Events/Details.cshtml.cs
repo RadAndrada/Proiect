@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,10 @@ namespace Proiect.Pages.Events
 
         public DetailsModel(ProiectContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public Event Event { get; set; }
+        public Event Event { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -25,16 +26,14 @@ namespace Proiect.Pages.Events
                 return NotFound();
             }
 
-            var existingEvent = await _context.Event.FirstOrDefaultAsync(m => m.ID == id);
+            var myEvent = await _context.Event.FirstOrDefaultAsync(m => m.ID == id);
 
-            if (existingEvent == null)
+            if (myEvent == null)
             {
                 return NotFound();
             }
-            else
-            {
-                Event = existingEvent;
-            }
+
+            Event = myEvent;
 
             return Page();
         }

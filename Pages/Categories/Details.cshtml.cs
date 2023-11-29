@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -6,19 +8,18 @@ using Microsoft.EntityFrameworkCore;
 using Proiect.Data;
 using Proiect.Models;
 
-namespace Proiect.Pages.Events
+namespace Proiect.Pages.Categories
 {
-    public class DeleteModel : PageModel
+    public class DetailsModel : PageModel
     {
-        private readonly ProiectContext _context;
+        private readonly Proiect.Data.ProiectContext _context;
 
-        public DeleteModel(ProiectContext context)
+        public DetailsModel(Proiect.Data.ProiectContext context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _context = context;
         }
 
-        [BindProperty]
-        public Event Event { get; set; } = default!;
+        public Category Category { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -27,20 +28,16 @@ namespace Proiect.Pages.Events
                 return NotFound();
             }
 
-            var myEvent = await _context.Event.FirstOrDefaultAsync(m => m.ID == id);
-
-            if (myEvent == null)
+            var category = await _context.Category.FirstOrDefaultAsync(m => m.ID == id);
+            if (category == null)
             {
                 return NotFound();
             }
             else
             {
-                Event = myEvent;
+                Category = category;
             }
-
             return Page();
         }
-
-
     }
 }

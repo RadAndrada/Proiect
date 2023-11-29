@@ -1,24 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Proiect.Data;
 using Proiect.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Security.Policy;
 
 namespace Proiect.Pages.Events
 {
-    public class EditModel : PageModel
+    public class EditModel : EventCategoriesPageModel
     {
         private readonly ProiectContext _context;
 
         public EditModel(ProiectContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         [BindProperty]
-        public Event Event { get; set; }
+        public Event Event { get; set; } = new Event(); // Inițializează instanța Event
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -27,58 +29,59 @@ namespace Proiect.Pages.Events
                 return NotFound();
             }
 
-            var existingEvent = await _context.Event.FirstOrDefaultAsync(m => m.ID == id);
+            Event = await _context.Event
+                .Include(b => b.Contact)
+                .Include(b => b.EventCategories).ThenInclude(b => b.Category)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
 
-            if (existingEvent == null)
+            if (Event == null)
             {
                 return NotFound();
             }
 
-            Event = existingEvent;
-            ViewData["ContactID"] = new SelectList(_context.Set<Contact>(), "ID",
-"ContactEmail");
+            PopulateAssignedCategoryData(_context, Event);
+            ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
+
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(int? id, string[] selectedCategories)
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            var existingEvent = await _context.Event.FirstOrDefaultAsync(m => m.ID == Event.ID);
-
-            if (existingEvent == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            // Actualizați doar proprietățile care s-au schimbat
-            existingEvent.ID = Event.ID;
-            existingEvent.Name = Event.Name;
-            existingEvent.Description = Event.Description;
-            existingEvent.Location = Event.Location;
-            existingEvent.Date = Event.Date;
-            existingEvent.Price = Event.Price;
-            existingEvent.Contact = Event.Contact;
-            // Repetați pentru celelalte proprietăți
+            var eventToUpdate = await _context.Event
+                .Include(i => i.Contact)
+                .Include(i => i.EventCategories)
+                    .ThenInclude(i => i.Category)
+                .FirstOrDefaultAsync(s => s.ID == id);
 
-            try
+            if (eventToUpdate == null)
             {
+                return NotFound();
+            }
+
+            if (await TryUpdateModelAsync<Event>(
+                eventToUpdate,
+                "Event",
+                i => i.Name,
+                i => i.Contact,
+                i => i.Price,
+                i => i.Location,
+                i => i.Date,
+                i => i.ContactID))
+            {
+                UpdateEventCategories(_context, selectedCategories, eventToUpdate);
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return NotFound();
+                return RedirectToPage("./Index");
             }
 
-            return RedirectToPage("./Index");
-        }
-
-        private bool EventExists(int id)
-        {
-            return _context.Event.Any(e => e.ID == id);
+            UpdateEventCategories(_context, selectedCategories, eventToUpdate);
+            PopulateAssignedCategoryData(_context, eventToUpdate);
+            return Page();
         }
     }
 }

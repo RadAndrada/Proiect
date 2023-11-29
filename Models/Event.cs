@@ -26,5 +26,8 @@ namespace Proiect.Models
 
         public int? ContactID { get; set; }
         public Contact? Contact { get; set; }
+
+        public ICollection<EventCategory>? EventCategories { get; set; }
+
     }
 }
