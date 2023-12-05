@@ -12,8 +12,8 @@ using Proiect.Data;
 namespace Proiect.Migrations
 {
     [DbContext(typeof(ProiectContext))]
-    [Migration("20231126105310_EventCategory")]
-    partial class EventCategory
+    [Migration("20231205161911_RecoverDB")]
+    partial class RecoverDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,7 +33,7 @@ namespace Proiect.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<string>("CategoryName")
+                    b.Property<string>("CategoryID")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

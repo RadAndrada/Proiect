@@ -12,8 +12,8 @@ using Proiect.Data;
 namespace Proiect.Migrations
 {
     [DbContext(typeof(ProiectContext))]
-    [Migration("20231126095529_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20231205183236_CategoryIndexData")]
+    partial class CategoryIndexData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,27 @@ namespace Proiect.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Proiect.Models.Category", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("CategoryID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Category");
+                });
 
             modelBuilder.Entity("Proiect.Models.Contact", b =>
                 {
@@ -50,6 +71,9 @@ namespace Proiect.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<int?>("CategoryID")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ContactID")
                         .HasColumnType("int");
 
@@ -73,13 +97,42 @@ namespace Proiect.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("CategoryID");
+
                     b.HasIndex("ContactID");
 
                     b.ToTable("Event");
                 });
 
+            modelBuilder.Entity("Proiect.Models.EventCategory", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("CategoryID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EventID")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("CategoryID");
+
+                    b.HasIndex("EventID");
+
+                    b.ToTable("EventCategory");
+                });
+
             modelBuilder.Entity("Proiect.Models.Event", b =>
                 {
+                    b.HasOne("Proiect.Models.Category", null)
+                        .WithMany("Events")
+                        .HasForeignKey("CategoryID");
+
                     b.HasOne("Proiect.Models.Contact", "Contact")
                         .WithMany("Event")
                         .HasForeignKey("ContactID");
@@ -87,9 +140,40 @@ namespace Proiect.Migrations
                     b.Navigation("Contact");
                 });
 
+            modelBuilder.Entity("Proiect.Models.EventCategory", b =>
+                {
+                    b.HasOne("Proiect.Models.Category", "Category")
+                        .WithMany("EventCategories")
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Proiect.Models.Event", "Event")
+                        .WithMany("EventCategories")
+                        .HasForeignKey("EventID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Proiect.Models.Category", b =>
+                {
+                    b.Navigation("EventCategories");
+
+                    b.Navigation("Events");
+                });
+
             modelBuilder.Entity("Proiect.Models.Contact", b =>
                 {
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("Proiect.Models.Event", b =>
+                {
+                    b.Navigation("EventCategories");
                 });
 #pragma warning restore 612, 618
         }

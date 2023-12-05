@@ -13,19 +13,25 @@ namespace Proiect.Pages.Events
     {
         private readonly ProiectContext _context;
 
-        public IndexModel(ProiectContext context)
+        public IndexModel(Proiect.Data.ProiectContext context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _context = context ;
         }
 
         public IList<Event> Events { get; set; } = new List<Event>();
         public EventData EventD { get; set; }
         public int EventID { get; set; }
         public int CategoryID { get; set; }
-        public async Task OnGetAsync( int? id, int? categoryID)
+        public string Name { get; set; }
+        public string CurrentFilter { get; set; }
+        public async Task OnGetAsync( int? id, int? categoryID, string sortOrder, string searchString)
         {
 
             EventD = new EventData();
+
+            Name = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+
+            CurrentFilter = searchString;
 
             EventD.Events = await _context.Event
                 .Include(b => b.Contact)
@@ -35,6 +41,10 @@ namespace Proiect.Pages.Events
                 .OrderBy(b => b.Name)
                 .ToListAsync();
 
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                EventD.Events = EventD.Events.Where(s => s.Name.Contains(searchString) || s.Name.Contains(searchString));
+            }
             if (id != null)
             {
                 EventID = id.Value;
@@ -45,7 +55,16 @@ namespace Proiect.Pages.Events
                     EventD.Categories = myEvent.EventCategories.Select(ec => ec.Category);
                 }
             }
+            
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    EventD.Events = EventD.Events.OrderByDescending(s => s.Name);
+                    break;
+                default: EventD.Events = EventD.Events.OrderBy(s => s.Name);
+                    break;
 
+            }
         }
     }
 }

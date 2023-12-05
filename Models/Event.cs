@@ -28,6 +28,7 @@ namespace Proiect.Models
         public Contact? Contact { get; set; }
 
         public ICollection<EventCategory>? EventCategories { get; set; }
+        public List<Category> Categories => EventCategories?.Select(ec => ec.Category).ToList();
 
     }
 }

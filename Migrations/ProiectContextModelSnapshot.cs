@@ -30,6 +30,10 @@ namespace Proiect.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<string>("CategoryID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -64,6 +68,9 @@ namespace Proiect.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<int?>("CategoryID")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ContactID")
                         .HasColumnType("int");
 
@@ -86,6 +93,8 @@ namespace Proiect.Migrations
                         .HasColumnType("decimal(5,2)");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("CategoryID");
 
                     b.HasIndex("ContactID");
 
@@ -117,6 +126,10 @@ namespace Proiect.Migrations
 
             modelBuilder.Entity("Proiect.Models.Event", b =>
                 {
+                    b.HasOne("Proiect.Models.Category", null)
+                        .WithMany("Events")
+                        .HasForeignKey("CategoryID");
+
                     b.HasOne("Proiect.Models.Contact", "Contact")
                         .WithMany("Event")
                         .HasForeignKey("ContactID");
@@ -146,6 +159,8 @@ namespace Proiect.Migrations
             modelBuilder.Entity("Proiect.Models.Category", b =>
                 {
                     b.Navigation("EventCategories");
+
+                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("Proiect.Models.Contact", b =>
