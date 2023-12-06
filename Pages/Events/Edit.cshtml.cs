@@ -72,7 +72,7 @@ namespace Proiect.Pages.Events
                 i => i.Price,
                 i => i.Location,
                 i => i.Date,
-                i => i.ContactID))
+                i => i.ContactEmail))
             {
                 UpdateEventCategories(_context, selectedCategories, eventToUpdate);
                 await _context.SaveChangesAsync();

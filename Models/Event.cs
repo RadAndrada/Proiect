@@ -24,8 +24,10 @@ namespace Proiect.Models
         [Column(TypeName ="decimal(5,2)")]
         public decimal Price  { get; set; }
 
-        public int? ContactID { get; set; }
+        public int? ContactEmail { get; set; }
         public Contact? Contact { get; set; }
+        public int? PaymentID { get; set; }
+        public Payment? Payment { get; set; }
 
         public ICollection<EventCategory>? EventCategories { get; set; }
         public List<Category> Categories => EventCategories?.Select(ec => ec.Category).ToList();
