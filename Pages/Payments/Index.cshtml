@@ -1,0 +1,56 @@
+﻿@page
+@model Proiect.Pages.Payments.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Payment[0].Participant)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Payment[0].Event)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model =>
+                         model.Payment[0].Event.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Payment[0].ReturnDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Payment) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Participant.FullName)
+            </td>
+                <td>
+                    @Html.DisplayFor(modelItem =>
+                             item.Event.Payment.Event.Name)
+                </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Event.Payment.Event.Name))
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReturnDate)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

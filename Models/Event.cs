@@ -23,7 +23,7 @@ namespace Proiect.Models
         [Display(Name = "Ticket Price")]
         [Column(TypeName ="decimal(5,2)")]
         public decimal Price  { get; set; }
-
+        [Display(Name = "Email Contact")]
         public int? ContactEmail { get; set; }
         public Contact? Contact { get; set; }
         public int? PaymentID { get; set; }

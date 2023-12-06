@@ -83,6 +83,9 @@ namespace Proiect.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<int?>("ContactEmail")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ContactID")
                         .HasColumnType("int");
 
