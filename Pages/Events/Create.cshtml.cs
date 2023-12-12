@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Proiect.Data;
 using Proiect.Models;
 
 namespace Proiect.Pages
 {
+    [Authorize(Roles = "Admin")]
     public class EventCategoriesPageModel : PageModel
     {
         public List<AssignedCategoryData> AssignedCategoryDataList;

@@ -22,6 +22,7 @@ namespace Proiect.Models
 
         [Display(Name = "Ticket Price")]
         [Column(TypeName ="decimal(5,2)")]
+        [Range(0.01, 500)]
         public decimal Price  { get; set; }
         [Display(Name = "Email Contact")]
         public int? ContactEmail { get; set; }
