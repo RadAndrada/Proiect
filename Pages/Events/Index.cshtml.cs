@@ -34,7 +34,6 @@ namespace Proiect.Pages.Events
             CurrentFilter = searchString;
 
             EventD.Events = await _context.Event
-                .Include(b => b.Contact)
                 .Include(b => b.EventCategories)
                     .ThenInclude(b => b.Category)
                 .AsNoTracking()

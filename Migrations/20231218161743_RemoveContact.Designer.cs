@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Proiect.Data;
 
@@ -11,9 +12,11 @@ using Proiect.Data;
 namespace Proiect.Migrations
 {
     [DbContext(typeof(ProiectContext))]
-    partial class ProiectContextModelSnapshot : ModelSnapshot
+    [Migration("20231218161743_RemoveContact")]
+    partial class RemoveContact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,6 +61,23 @@ namespace Proiect.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("Proiect.Models.Contact", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Contact");
+                });
+
             modelBuilder.Entity("Proiect.Models.Event", b =>
                 {
                     b.Property<int>("ID")
@@ -68,6 +88,9 @@ namespace Proiect.Migrations
 
                     b.Property<string>("ContactEmail")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ContactID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -91,6 +114,8 @@ namespace Proiect.Migrations
                         .HasColumnType("decimal(5,2)");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("ContactID");
 
                     b.ToTable("Event");
                 });
@@ -185,6 +210,13 @@ namespace Proiect.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Proiect.Models.Event", b =>
+                {
+                    b.HasOne("Proiect.Models.Contact", null)
+                        .WithMany("Event")
+                        .HasForeignKey("ContactID");
+                });
+
             modelBuilder.Entity("Proiect.Models.EventCategory", b =>
                 {
                     b.HasOne("Proiect.Models.Category", "Category")
@@ -222,6 +254,11 @@ namespace Proiect.Migrations
             modelBuilder.Entity("Proiect.Models.Category", b =>
                 {
                     b.Navigation("EventCategories");
+                });
+
+            modelBuilder.Entity("Proiect.Models.Contact", b =>
+                {
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("Proiect.Models.Event", b =>

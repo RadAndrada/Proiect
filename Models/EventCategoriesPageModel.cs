@@ -1,56 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Proiect.Data;
 using Proiect.Models;
 
-namespace Proiect.Pages.Events
+namespace Proiect.Pages
 {
-    public class CreateModel : EventCategoriesPageModel
+    [Authorize(Roles = "Admin")]
+    public class EventCategoriesPageModel : PageModel
     {
-        private readonly Proiect.Data.ProiectContext _context;
+        public List<AssignedCategoryData> AssignedCategoryDataList;
 
-        public CreateModel(Proiect.Data.ProiectContext context)
+        public void PopulateAssignedCategoryData(ProiectContext context, Event eventItem)
         {
-            _context = context;
-        }
+            var allCategories = context.Category.ToList();
+            var eventCategories = new HashSet<int>(eventItem.EventCategories.Select(c => c.CategoryID));
 
-        public IActionResult OnGet()
-        {
-            ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
-            var newEvent = new Event();
             AssignedCategoryDataList = new List<AssignedCategoryData>();
-
-            return Page();
-        }
-
-        [BindProperty]
-        public Event Event { get; set; }
-
-        // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
-        public async Task<IActionResult> OnPostAsync(string[] selectedCategories, RedirectToPageResult redirectToPageResult)
-        {
-            var newEvent = new Event();
-            if (selectedCategories != null)
+            foreach (var cat in allCategories)
             {
-                newEvent.EventCategories = new List<EventCategory>();
-                foreach (var cat in selectedCategories)
+                AssignedCategoryDataList.Add(new AssignedCategoryData
                 {
-                    var catToAdd = new EventCategory
+                    CategoryID = cat.ID,
+                    Name = cat.CategoryID, // Modificarea aici
+                    Assigned = eventCategories.Contains(cat.ID)
+                });
+            }
+        }
+        public void UpdateEventCategories(ProiectContext context, string[] selectedCategories, Event eventToUpdate)
+        {
+            if (selectedCategories == null)
+            {
+                eventToUpdate.EventCategories = new List<EventCategory>();
+                return;
+            }
+
+            var selectedCategoriesHS = new HashSet<string>(selectedCategories);
+            var eventCategories = new HashSet<int>(eventToUpdate.EventCategories.Select(c => c.CategoryID));
+
+            foreach (var cat in context.Category)
+            {
+                if (selectedCategoriesHS.Contains(cat.ID.ToString()))
+                {
+                    if (!eventCategories.Contains(cat.ID))
                     {
-                        CategoryID = int.Parse(cat)
-                    };
-                    newEvent.EventCategories.Add(catToAdd);
+                        eventToUpdate.EventCategories.Add(new EventCategory
+                        {
+                            EventID = eventToUpdate.ID,
+                            CategoryID = cat.ID
+                        });
+                    }
+                }
+                else
+                {
+                    if (eventCategories.Contains(cat.ID))
+                    {
+                        EventCategory categoryToRemove = eventToUpdate.EventCategories
+                            .SingleOrDefault(i => i.CategoryID == cat.ID);
+                        context.Remove(categoryToRemove);
+                    }
                 }
             }
-            Event.EventCategories = newEvent.EventCategories;
-            _context.Event.Add(Event);
-            await _context.SaveChangesAsync();
-            return RedirectToPage("./Index");
         }
     }
 }

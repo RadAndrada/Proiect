@@ -24,9 +24,8 @@ namespace Proiect.Models
         [Column(TypeName ="decimal(5,2)")]
         [Range(0.01, 500)]
         public decimal Price  { get; set; }
-        [Display(Name = "Email Contact")]
-        public int? ContactEmail { get; set; }
-        public Contact? Contact { get; set; }
+        [Display(Name = "Email")]
+        public string? ContactEmail { get; set; }
         public int? PaymentID { get; set; }
         public Payment? Payment { get; set; }
 

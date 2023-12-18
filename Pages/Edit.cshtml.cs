@@ -28,9 +28,7 @@ namespace Proiect.Pages
                 return NotFound();
             }
 
-            var eventItem = await _context.Event
-                .Include(e => e.Contact) // Include relația cu Contact pentru SelectList
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var eventItem = await _context.Event.FirstOrDefaultAsync(m => m.ID == id);
 
             if (eventItem == null)
             {
@@ -38,7 +36,7 @@ namespace Proiect.Pages
             }
 
             Event = eventItem;
-            ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
+            //ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
 
             return Page();
         }

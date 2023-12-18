@@ -21,7 +21,7 @@ namespace Proiect.Pages
 
         public IActionResult OnGet()
         {
-        ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
+        //ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
             return Page();
         }
 

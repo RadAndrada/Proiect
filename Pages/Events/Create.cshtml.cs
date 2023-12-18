@@ -1,67 +1,56 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Proiect.Data;
 using Proiect.Models;
 
-namespace Proiect.Pages
+namespace Proiect.Pages.Events
 {
-    [Authorize(Roles = "Admin")]
-    public class EventCategoriesPageModel : PageModel
+    public class CreateModel : EventCategoriesPageModel
     {
-        public List<AssignedCategoryData> AssignedCategoryDataList;
+        private readonly Proiect.Data.ProiectContext _context;
 
-        public void PopulateAssignedCategoryData(ProiectContext context, Event eventItem)
+        public CreateModel(Proiect.Data.ProiectContext context)
         {
-            var allCategories = context.Category.ToList();
-            var eventCategories = new HashSet<int>(eventItem.EventCategories.Select(c => c.CategoryID));
-
-            AssignedCategoryDataList = new List<AssignedCategoryData>();
-            foreach (var cat in allCategories)
-            {
-                AssignedCategoryDataList.Add(new AssignedCategoryData
-                {
-                    CategoryID = cat.ID,
-                    Name = cat.CategoryID, // Modificarea aici
-                    Assigned = eventCategories.Contains(cat.ID)
-                });
-            }
+            _context = context;
         }
-        public void UpdateEventCategories(ProiectContext context, string[] selectedCategories, Event eventToUpdate)
+
+        public IActionResult OnGet()
         {
-            if (selectedCategories == null)
-            {
-                eventToUpdate.EventCategories = new List<EventCategory>();
-                return;
-            }
+           // ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
+            var newEvent = new Event();
+            AssignedCategoryDataList = new List<AssignedCategoryData>();
 
-            var selectedCategoriesHS = new HashSet<string>(selectedCategories);
-            var eventCategories = new HashSet<int>(eventToUpdate.EventCategories.Select(c => c.CategoryID));
+            return Page();
+        }
 
-            foreach (var cat in context.Category)
+        [BindProperty]
+        public Event Event { get; set; }
+
+        // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+        public async Task<IActionResult> OnPostAsync(string[] selectedCategories)
+        {
+            var newEvent = new Event();
+            if (selectedCategories != null)
             {
-                if (selectedCategoriesHS.Contains(cat.ID.ToString()))
+                newEvent.EventCategories = new List<EventCategory>();
+                foreach (var cat in selectedCategories)
                 {
-                    if (!eventCategories.Contains(cat.ID))
+                    var catToAdd = new EventCategory
                     {
-                        eventToUpdate.EventCategories.Add(new EventCategory
-                        {
-                            EventID = eventToUpdate.ID,
-                            CategoryID = cat.ID
-                        });
-                    }
-                }
-                else
-                {
-                    if (eventCategories.Contains(cat.ID))
-                    {
-                        EventCategory categoryToRemove = eventToUpdate.EventCategories
-                            .SingleOrDefault(i => i.CategoryID == cat.ID);
-                        context.Remove(categoryToRemove);
-                    }
+                        CategoryID = int.Parse(cat)
+                    };
+                    newEvent.EventCategories.Add(catToAdd);
                 }
             }
+            Event.EventCategories = newEvent.EventCategories;
+            _context.Event.Add(Event);
+            await _context.SaveChangesAsync();
+            return RedirectToPage("./Index");
         }
     }
 }

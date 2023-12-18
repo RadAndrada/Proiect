@@ -32,7 +32,6 @@ namespace Proiect.Pages.Events
             }
 
             Event = await _context.Event
-                .Include(b => b.Contact)
                 .Include(b => b.EventCategories).ThenInclude(b => b.Category)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
@@ -43,7 +42,7 @@ namespace Proiect.Pages.Events
             }
 
             PopulateAssignedCategoryData(_context, Event);
-            ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
+            //ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
 
             return Page();
         }
@@ -56,7 +55,6 @@ namespace Proiect.Pages.Events
             }
 
             var eventToUpdate = await _context.Event
-                .Include(i => i.Contact)
                 .Include(i => i.EventCategories)
                     .ThenInclude(i => i.Category)
                 .FirstOrDefaultAsync(s => s.ID == id);
@@ -70,7 +68,6 @@ namespace Proiect.Pages.Events
                 eventToUpdate,
                 "Event",
                 i => i.Name,
-                i => i.Contact,
                 i => i.Price,
                 i => i.Location,
                 i => i.Date,

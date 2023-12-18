@@ -15,7 +15,6 @@ namespace Proiect.Data
         }
 
         public DbSet<Proiect.Models.Event> Event { get; set; } = default!;
-        public DbSet<Proiect.Models.Contact> Contact { get; set; } = default!;
         public DbSet<Proiect.Models.Category> Category { get; set; } = default!;
         public DbSet<Proiect.Models.EventCategory> EventCategory { get; set; } = default!;
         public DbSet<Proiect.Models.Participant> Participant { get; set; } = default!;
