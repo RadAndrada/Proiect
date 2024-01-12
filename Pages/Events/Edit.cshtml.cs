@@ -32,9 +32,9 @@ namespace Proiect.Pages.Events
             }
 
             Event = await _context.Event
-                .Include(b => b.EventCategories).ThenInclude(b => b.Category)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ID == id);
+           .Include(b => b.EventCategories).ThenInclude(b => b.Category)
+           .AsNoTracking()
+           .FirstOrDefaultAsync(m => m.ID == id);
 
             if (Event == null)
             {
@@ -42,7 +42,6 @@ namespace Proiect.Pages.Events
             }
 
             PopulateAssignedCategoryData(_context, Event);
-            //ViewData["ContactID"] = new SelectList(_context.Contact, "ID", "ID");
 
             return Page();
         }
@@ -55,32 +54,42 @@ namespace Proiect.Pages.Events
             }
 
             var eventToUpdate = await _context.Event
-                .Include(i => i.EventCategories)
-                    .ThenInclude(i => i.Category)
-                .FirstOrDefaultAsync(s => s.ID == id);
+                .Include(e => e.EventCategories)
+                .FirstOrDefaultAsync(e => e.ID == id);
 
             if (eventToUpdate == null)
             {
                 return NotFound();
             }
 
-            if (await TryUpdateModelAsync<Event>(
-                eventToUpdate,
-                "Event",
-                i => i.Name,
-                i => i.Price,
-                i => i.Location,
-                i => i.Date,
-                i => i.ContactEmail))
+            eventToUpdate.Name = Event.Name;
+            eventToUpdate.Description = Event.Description; // Adaugă această linie
+            eventToUpdate.Location = Event.Location;
+            eventToUpdate.Date = Event.Date;
+            eventToUpdate.Price = Event.Price;
+            eventToUpdate.ContactEmail = Event.ContactEmail;
+
+            // Update categories
+            UpdateEventCategories(_context, selectedCategories, eventToUpdate);
+
+            try
             {
-                UpdateEventCategories(_context, selectedCategories, eventToUpdate);
                 await _context.SaveChangesAsync();
-                return RedirectToPage("./Index");
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (_context.Event.FirstOrDefault(e => e.ID == id.Value) == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw; // Handle the exception as needed
+                }
             }
 
-            UpdateEventCategories(_context, selectedCategories, eventToUpdate);
-            PopulateAssignedCategoryData(_context, eventToUpdate);
-            return Page();
+            return RedirectToPage("./Index");
         }
+
     }
 }

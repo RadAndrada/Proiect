@@ -23,7 +23,7 @@ namespace Proiect.Pages
                 AssignedCategoryDataList.Add(new AssignedCategoryData
                 {
                     CategoryID = cat.ID,
-                    Name = cat.CategoryID, // Modificarea aici
+                    Name = cat.CategoryName, // Modificarea aici
                     Assigned = eventCategories.Contains(cat.ID)
                 });
             }

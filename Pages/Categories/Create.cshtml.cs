@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Proiect.Data;
 using Proiect.Models;
+using System.Threading.Tasks;
 
 namespace Proiect.Pages.Categories
 {
     public class CreateModel : PageModel
     {
-        private readonly Proiect.Data.ProiectContext _context;
+        private readonly ProiectContext _context;
 
-        public CreateModel(Proiect.Data.ProiectContext context)
+        public CreateModel(ProiectContext context)
         {
             _context = context;
         }
@@ -25,9 +21,8 @@ namespace Proiect.Pages.Categories
         }
 
         [BindProperty]
-        public Category Category { get; set; } = default!;
+        public Category Category { get; set; }
 
-        // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -37,6 +32,8 @@ namespace Proiect.Pages.Categories
 
             _context.Category.Add(Category);
             await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Categoria a fost adăugată cu succes!";
 
             return RedirectToPage("./Index");
         }

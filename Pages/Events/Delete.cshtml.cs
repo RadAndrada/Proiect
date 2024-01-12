@@ -42,7 +42,18 @@ namespace Proiect.Pages.Events
 
             return Page();
         }
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (Event == null)
+            {
+                return NotFound();
+            }
 
+            _context.Event.Remove(Event);
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Index");
+        }
 
     }
 }

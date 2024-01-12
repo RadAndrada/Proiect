@@ -42,11 +42,13 @@
             <th>
                 @Html.DisplayNameFor(model => model.Events[0].ContactEmail)
             </th>
-            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.Events[0].EventCategories)
+            </th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.EventD.Events) 
+        @foreach (var item in Model.EventD.Events)
         {
             string selectedRow = "";
             if (item.ID == Model.EventID)
@@ -76,11 +78,17 @@
                 </td>
                 <td>
                     @{
-                         foreach (var category in item.EventCategories)
-                         {
-                         @category.Category.ID @: @category.Category.CategoryID <br/>
-                         }
-                      }
+                        var isFirstCategory = true;
+                        foreach (var category in item.EventCategories)
+                        {
+                            if (!isFirstCategory)
+                            {
+                                <br />
+                            }
+                            @category.Category.CategoryName
+                            isFirstCategory = false;
+                        }
+                    }
                 </td>
                 <td>
                     <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |

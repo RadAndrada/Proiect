@@ -22,14 +22,17 @@ namespace Proiect.Pages.Categories
 
         public IList<Category> Category { get; set; } = default!;
 
+        public CategoryIndexData CategoryData { get; set; }
+
         public async Task OnGetAsync()
         {
-            Category = await _context.Category.ToListAsync();
+            CategoryData = new CategoryIndexData();
+            CategoryData.Categories = await _context.Category
+                .Include(c => c.EventCategories)
+                .ThenInclude(ec => ec.Event)
+                .OrderBy(c => c.CategoryName)
+                .ToListAsync();
         }
-
-        public CategoryIndexData CategoryData { get; set; }
-        public int CategoryID { get; set; }
-        public int EventID { get; set; }
 
         public async Task OnGetByIdAsync(int? id)
         {
@@ -52,5 +55,8 @@ namespace Proiect.Pages.Categories
                 }
             }
         }
+
+        public int CategoryID { get; set; }
+        public int EventID { get; set; }
     }
 }

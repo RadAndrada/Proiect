@@ -21,8 +21,8 @@ namespace Proiect.Pages.EventsCategories
 
         public IActionResult OnGet()
         {
-        ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "ID");
-        ViewData["EventID"] = new SelectList(_context.Event, "ID", "ID");
+            ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "ID");
+            ViewData["EventID"] = new SelectList(_context.Event, "ID", "ID");
             return Page();
         }
 

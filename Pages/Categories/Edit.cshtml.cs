@@ -17,12 +17,11 @@ namespace Proiect.Pages.Categories
 
         public EditModel(Proiect.Data.ProiectContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         [BindProperty]
-        public Category Category { get; set; } = default!;
-
+        public Category Category { get; set; } = new Category();
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -30,12 +29,16 @@ namespace Proiect.Pages.Categories
                 return NotFound();
             }
 
-            var category =  await _context.Category.FirstOrDefaultAsync(m => m.ID == id);
-            if (category == null)
+            Category = await _context.Category
+           .Include(b => b.EventCategories).ThenInclude(b => b.Event)
+           .FirstOrDefaultAsync(m => m.ID == id);
+
+
+            if (Category == null)
             {
                 return NotFound();
             }
-            Category = category;
+            Category = Category;
             return Page();
         }
 

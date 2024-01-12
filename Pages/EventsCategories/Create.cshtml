@@ -15,11 +15,11 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="EventCategory.EventID" class="control-label"></label>
-                <select asp-for="EventCategory.EventID" class ="form-control" asp-items="ViewBag.EventID"></select>
+                <select asp-for="EventCategory.EventID" class="form-control" asp-items="@(ViewData["EventID"] as SelectList)"></select>
             </div>
             <div class="form-group">
                 <label asp-for="EventCategory.CategoryID" class="control-label"></label>
-                <select asp-for="EventCategory.CategoryID" class ="form-control" asp-items="ViewBag.CategoryID"></select>
+                <select asp-for="EventCategory.CategoryID" class="form-control" asp-items="@(ViewData["CategoryID"] as SelectList)"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
